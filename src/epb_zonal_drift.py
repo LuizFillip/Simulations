@@ -3,10 +3,6 @@ import matplotlib.pyplot as plt
 import datetime as dt
 import GEO as gg
 
-def velocity(v):
-    return v * 3.6
-def displacement(x0, v0, dt):
-    return x0 + v0 * dt / 111
 
 
         
@@ -37,13 +33,13 @@ def save_intervals():
         
         # fig, epb_dn = plot_simulate_bubble_drift(year, Dt)
         
-        fig, ax = mappping(year)
+        fig, ax = gg.mappping(year)
         
         delta = dt.timedelta(hours = Dt)
         
         epb_dn = dt.datetime(year, 1, 1, 0) + delta
          
-        plot_drift_velocities(ax, Dt, epb_dn)
+        # plot_drift_velocities(ax, Dt, epb_dn)
         
         fig.suptitle(epb_dn.strftime("%H:%M:%S (UT)"), y = 0.7)
         
