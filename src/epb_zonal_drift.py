@@ -1,5 +1,7 @@
-
-
+import numpy as np
+import matplotlib.pyplot as plt
+import datetime as dt
+import GEO as gg
 
 def velocity(v):
     return v * 3.6
@@ -10,7 +12,7 @@ def displacement(x0, v0, dt):
         
 def plot_simulate_bubble_drift(year, Dt):
     
-    fig, ax = mappping(year)
+    fig, ax = gg.mappping(year)
     
     delta = dt.timedelta(hours = Dt)
     
@@ -27,34 +29,27 @@ year = 2014
 twilight = 18
 
 
-# df = b.load(
-#     pb.epb_path(
-#         year, path = 'events3'
-#         )
-#     )
-
-# ds = b.sel_times(df, dn, hours = 12)
-
-
-for Dt in np.arange(0, 2, 0.02):
-
-    plt.ioff()
+def save_intervals():
     
-    # fig, epb_dn = plot_simulate_bubble_drift(year, Dt)
+    for Dt in np.arange(0, 2, 0.02):
     
-    fig, ax = mappping(year)
-    
-    delta = dt.timedelta(hours = Dt)
-    
-    epb_dn = dt.datetime(year, 1, 1, 0) + delta
-     
-    plot_drift_velocities(ax, Dt, epb_dn)
-    
-    fig.suptitle(epb_dn.strftime("%H:%M:%S (UT)"), y = 0.7)
-    
-    name = epb_dn.strftime('%Y%m%d%H%M')
-    print(name)
-    fig.savefig(f'temp/{name}')
+        plt.ioff()
         
-    plt.clf()   
-    plt.close()
+        # fig, epb_dn = plot_simulate_bubble_drift(year, Dt)
+        
+        fig, ax = mappping(year)
+        
+        delta = dt.timedelta(hours = Dt)
+        
+        epb_dn = dt.datetime(year, 1, 1, 0) + delta
+         
+        plot_drift_velocities(ax, Dt, epb_dn)
+        
+        fig.suptitle(epb_dn.strftime("%H:%M:%S (UT)"), y = 0.7)
+        
+        name = epb_dn.strftime('%Y%m%d%H%M')
+        print(name)
+        fig.savefig(f'temp/{name}')
+            
+        plt.clf()   
+        plt.close()
