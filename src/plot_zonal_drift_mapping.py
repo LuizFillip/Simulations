@@ -4,9 +4,8 @@ import cartopy.crs as ccrs
 import datetime as dt 
 import numpy as np 
 import base as b 
-
-import PlasmaBubbles as pb 
 from tqdm import tqdm 
+
 
 b.config_labels()
 
@@ -38,9 +37,6 @@ def mappping(time):
     return fig, ax
 
 
-
-    
-    
 def ellipse(
         center, 
         angle = 110, 
@@ -81,23 +77,24 @@ def plot_ellipse(
         semi_major = semi_major
         )
     
-    ax.plot(x, y)
+    ax.plot(x, y, color = 'k')
    
     ax.fill(x, y, color = 'gray', alpha = 0.5)
     
-def plot_terminator_line(dn):
+def plot_terminator_line(ax, dn):
     
-    lon, lat = gg.terminator2(dn, 18)
+    te_lon, te_lat = gg.terminator2(dn, 18)
     
-    eq_lon, eq_lat = gg.load_equator(year, values = True)
-    ilon, ilat = gg.intersection(eq_lon, eq_lat, lon, lat)
+    eq_lon, eq_lat = gg.load_equator(dn.year, values = True)
     
-    ax.scatter(lon, lat, c = 'k', s = 5)
+    ilon, ilat = gg.intersection(eq_lon, eq_lat, te_lon, te_lat)
+    
+    ax.scatter(te_lon, te_lat, c = 'k', s = 5)
     
     ax.scatter(ilon, ilat, c = 'k', s = 5)
 
 
-    if len(ilon) > 1 and len(ilat)>1:
+    if len(ilon) > 1 and len(ilat) > 1:
         ilon = ilon[0]
         ilat = ilat[0]
         
@@ -117,85 +114,90 @@ def growth_phase(
 
         plot_ellipse(
                  ax, lon = epb_lon, 
-                 semi_major=count)
+                 semi_major = count
+                 )
         
     else:
         
         plot_ellipse(
-                 ax, lon = epb_lon, 
-                 semi_major=max_edge)
-year = 2013
-start = dt.datetime(year, 1, 1, 23, 0)
-
-b.make_dir('temp')
-
-def run(start_day, v0 = 100, x0 = -60):
-    
-    term = pb.terminator(x0, start_day, float_fmt = False) 
-    count = 0
-    for i, Dt in enumerate(np.arange(0, 2, 0.02)):
-    
-        # plt.ioff()
+                 ax, 
+                 lon = epb_lon, 
+                 semi_major = max_edge
+                 )
         
-        delta = dt.timedelta(hours = Dt)
-        
-        time = start_day + delta
-        
-        fig, ax = mappping(time)
-
-        
-                
-        
-            
-        
-        # fig = plot_epb_drift(time, term, Dt)
-        
-        name = time.strftime('%Y%m%d%H%M')
-        
-        plt.show()
-       
-        # fig.savefig(f'temp/{name}')
-        
-        # plt.clf()   
-        # plt.close()
-
-# delta = dt.timedelta(hours = 3)
-# time = start_day + delta
-# fig = plot_epb_drift(time, start_day, v0 = 100, x0 = -60)
-
-# run(start_day)
+    return None
 
 
 
-x0 = -60
-term = pb.terminator(x0, start, float_fmt = False) 
-v0 = 100
-Dt = 1
+def save_figs(fig, time):
+    b.make_dir('temp')
+    name = time.strftime('%Y%m%d%H%M')
+    fig.savefig(f'temp/{name}')
+    return 
+
 
 def update(start, Dt):
     delta = dt.timedelta(hours = Dt)
-    
     return start + delta
-    
 
-count = 0
-for i, Dt in enumerate(np.arange(0, 2, 0.1)):
-      
-    time = update(start, Dt)
+def sunset_developing(ax, ilon, Dt, count, x0 = -60, v0 = 100):
     
-    fig, ax = mappping(time)
-    
-    ilon = plot_terminator_line(time)
+    ax.text(
+        0.1, 0.8, 
+        '$V_{zonal}$ = ' + f'{v0} m/s', 
+        transform = ax.transAxes
+        )
     
     epb_lon = displacement(x0, velocity(v0), Dt)
-    # if (time >= term):
+    
     if (epb_lon > ilon):
         count += 1 
         growth_phase(ax, epb_lon, count)
-   
+        
+    return count
+
+
+def sunset_chain_occurrence(start, v0 = 100):
+
+    longs_start = [-50, -60, -70, -80]
+    
+    counts = {x0: 0 for x0 in longs_start}
+        
+    for Dt in np.arange(0, 3, 0.02):
+        
+        plt.ioff()
+        time = update(start, Dt)
+
+        fig, ax = mappping(time)
+        ilon = plot_terminator_line(ax, time)
+        
+        for x0 in longs_start:
+            counts[x0] = sunset_developing(
+                ax, 
+                ilon, 
+                Dt, 
+                counts[x0], 
+                x0 = x0, 
+                v0 = v0
+                )
+            
+            
+        save_figs(fig, time)
+        
+        plt.clf()   
+        plt.close()
             
             
             
 
+start = dt.datetime(2013, 1, 1, 22, 0)
 
-plt.show()
+sunset_chain_occurrence(start, v0 = 100)
+    
+    
+b.images_to_movie(
+        path_in = 'temp/', 
+        path_out = '',
+        movie_name = 'test',
+        fps = 12
+        )
