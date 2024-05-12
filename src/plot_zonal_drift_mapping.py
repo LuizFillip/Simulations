@@ -72,10 +72,7 @@ def plot_ellipse(
     
     i = b.find_closest(eq_lon, lon)
     
-    x, y = ellipse(
-        (eq_lon[i], eq_lat[i]), 
-        semi_major = semi_major
-        )
+    x, y = ellipse((eq_lon[i], eq_lat[i]), semi_major = semi_major)
     
     ax.plot(x, y, color = 'k')
    
@@ -92,7 +89,6 @@ def plot_terminator_line(ax, dn):
     ax.scatter(te_lon, te_lat, c = 'k', s = 5)
     
     ax.scatter(ilon, ilat, c = 'k', s = 5)
-
 
     if len(ilon) > 1 and len(ilat) > 1:
         ilon = ilon[0]
@@ -130,9 +126,9 @@ def growth_phase(
 
 
 def save_figs(fig, time):
-    b.make_dir('temp')
+    b.make_dir('temp2')
     name = time.strftime('%Y%m%d%H%M')
-    fig.savefig(f'temp/{name}')
+    fig.savefig(f'temp2/{name}')
     return 
 
 
@@ -160,10 +156,10 @@ def sunset_developing(ax, ilon, Dt, count, x0 = -60, v0 = 100):
 def sunset_chain_occurrence(start, v0 = 100):
 
     longs_start = [-50, -60, -70, -80]
-    
+    x0 = -60
     counts = {x0: 0 for x0 in longs_start}
-        
-    for Dt in np.arange(0, 3, 0.02):
+    
+    for Dt in tqdm(np.arange(0, 3, 0.02)):
         
         plt.ioff()
         time = update(start, Dt)
@@ -171,15 +167,15 @@ def sunset_chain_occurrence(start, v0 = 100):
         fig, ax = mappping(time)
         ilon = plot_terminator_line(ax, time)
         
-        for x0 in longs_start:
-            counts[x0] = sunset_developing(
-                ax, 
-                ilon, 
-                Dt, 
-                counts[x0], 
-                x0 = x0, 
-                v0 = v0
-                )
+        # for x0 in longs_start:
+        counts[x0] = sunset_developing(
+            ax, 
+            ilon, 
+            Dt, 
+            counts[x0], 
+            x0 = x0, 
+            v0 = v0
+            )
             
             
         save_figs(fig, time)
@@ -190,14 +186,14 @@ def sunset_chain_occurrence(start, v0 = 100):
             
             
 
-start = dt.datetime(2013, 1, 1, 22, 0)
+# start = dt.datetime(2013, 1, 1, 22, 0)
 
-sunset_chain_occurrence(start, v0 = 100)
+# sunset_chain_occurrence(start, v0 = 100)
     
     
-b.images_to_movie(
-        path_in = 'temp/', 
-        path_out = '',
-        movie_name = 'test',
-        fps = 12
-        )
+# b.images_to_movie(
+#         path_in = 'temp/', 
+#         path_out = '',
+#         movie_name = 'test',
+#         fps = 12
+#         )
