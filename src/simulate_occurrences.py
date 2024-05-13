@@ -3,6 +3,7 @@ import numpy as np
 import core as c
 import datetime as dt
 import random 
+import matplotlib.pyplot as plt 
 
 
 def random_days(start_date, end_date, n):
@@ -69,24 +70,25 @@ def simulate_cases(year):
     
     return adding_non_occurrences(df)
 
-import matplotlib.pyplot as plt 
-
-year = 2015
-epb = simulate_cases(year)
 
 
-df = c.load_results('jic')
-
-df = df.loc[df.index.year == year]
-
-df['epb'] = epb['epb'].copy()
-
-ds = c.probability_distribution(
-     df, 
-     parameter = 'gamma'
-     )  
+def replace_simul_by_obs():
+    year = 2015
+    epb = simulate_cases(year)
+    
+    
+    df = c.load_results('jic')
+    
+    df = df.loc[df.index.year == year]
+    
+    df['epb'] = epb['epb'].copy()
+    
+    ds = c.probability_distribution(
+         df, 
+         parameter = 'gamma'
+         )  
  
-def plot():
+def plot(ds, epb):
     
     
     
@@ -97,13 +99,10 @@ def plot():
     
     ax[1].plot(ds['start'], ds['rate'])
     
-
-# df['']
-
-ds1 = c.count_occurences(df).month
-
-# ds1['epb'].plot(kind = 'bar')
-
-# df['gamma'].plot()
-
-plt.plot(ds['start'], ds['rate'])
+    # ds1 = c.count_occurences(df).month
+    
+    # ds1['epb'].plot(kind = 'bar')
+    
+    # df['gamma'].plot()
+    
+    plt.plot(ds['start'], ds['rate'])
