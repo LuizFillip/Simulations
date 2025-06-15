@@ -91,27 +91,3 @@ def simulate_roti_points(
     ds = pd.concat(out)
     return ds.loc[ds.index < df.index[-1]]
   
-    
-
-
-# def main():
-# start = dt.datetime(2014, 1, 2, 20)
-
-# df =  pb.concat_files(
-#     start, 
-#     root = 'E:\\'
-#     )
-
-        
-# ds = simulate_roti_points(
-#         df)
-
-
-# df = ds.loc[ds['prn'] == 'G21']
-
-
-# import GEO as gg 
-
-# fig, ax = gg.quick_map()
-
-# ax.plot(df['lon'], df['lat'])
